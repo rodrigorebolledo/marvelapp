@@ -127,6 +127,29 @@ export default function Championship(){
         
     }
 
+    const handleResults = () => {
+        let result = []
+        orderedCharacter.map((parentElement) => {
+            parentElement.map((childElement) => {
+                result.push(childElement);
+            });
+        });
+
+        result.sort((a, b) => {
+            if(a.wins > b.wins){
+                return -1
+            }
+
+            if(a.wins < b.wins){
+                return 1
+            }
+
+            return 0;
+        });
+
+        console.log(result);
+    }
+
 
     const getDamage = (powerAttacker, defenseVictim) => {
         const randomNumberOne = Math.random();
@@ -224,14 +247,6 @@ export default function Championship(){
         let lifeFirstCharacterCopy = lifeFirstCharacter;
         let lifeSecondCharacterCopy = lifeSecondCharacter;
         let clasificados = [];
-        let existClassifiedOne = false;
-        let existOne = false;
-        let existClassifiedTwo = false;
-        let existTwo = false;
-        let idxClassifiedOne;
-        let idxClassifiedTwo;
-        let idxOne;
-        let idxTwo;
         console.log('isLoadingFight ' + isLoadingFight);
         console.log('countFirstFight ' + countFirstFight);
         console.log('orderedCharacter.length  ' + (orderedCharacter.length -1));
@@ -249,35 +264,6 @@ export default function Championship(){
                         lifeSecondCharacterCopy = 0;
                         orderedCharacter[countFirstFight][0].wins = orderedCharacter[countFirstFight][0].wins + 1
                         console.log(`El ganador es: ${nameFirstCharacter}`);
-                        result.map((element, idx) => {
-                            if(element.id === orderedCharacter[countFirstFight][0].id){
-                                console.log('ya existe');
-                                existOne = true;
-                                idxOne = idx;
-                            } else {
-                                console.log('no existe')
-                                existOne = false;
-                            }
-
-                            if(element.id === orderedCharacter[countFirstFight][1].id){
-                                console.log('ya existe');
-                                existOne = true;
-                                idxTwo = idx;
-                            } else {
-                                console.log('no existe')
-                                existOne = false;
-                            } 
-                        });
-                        if(existOne === true){
-                            result[idxOne].wins =  result[idxOne].wins + 1;
-                        } else {
-                            result.push(orderedCharacter[countFirstFight][0]); //Ganador
-                        }
-                        if(existOne === true){
-                            //pass
-                        } else {
-                            result.push(orderedCharacter[countFirstFight][1]);
-                        }
                         setIsFighting(false);
                         setCountFirstFight(countFirstFight + 1);
                     }
@@ -296,38 +282,6 @@ export default function Championship(){
                         lifeFirstCharacterCopy = 0;
                         orderedCharacter[countFirstFight][1].wins = orderedCharacter[countFirstFight][1].wins + 1
                         console.log(`El ganador es: ${nameSecondCharacter}`);
-                        result.map((element, idx) => {
-                            if(element.id === orderedCharacter[countFirstFight][1].id){
-                                console.log('ya existe');
-                                existTwo = true;
-                                idxTwo = idx;
-                            } else {
-                                console.log('no existe')
-                                existOne = false;
-                            }
-
-                            if(element.id === orderedCharacter[countFirstFight][0].id){
-                                console.log('ya existe');
-                                existOne = true;
-                                idxOne = idx;
-                            } else {
-                                console.log('no existe')
-                                existOne = false;
-                            } 
-                        });
-                        if(existClassifiedTwo === true){
-                            result[idxTwo].wins =  result[idxTwo].wins + 1;
-                        } else {
-                            result.push(orderedCharacter[countFirstFight][1]); //Ganador
-                        }
-                        if(existClassifiedOne === true){
-                            //pass
-                        } else {
-                            result.push(orderedCharacter[countFirstFight][0]);
-                        }
-                        // result.push(orderedCharacter[countFirstFight][0]);                      
-                        // result.push(orderedCharacter[countFirstFight][1]); //Ganador
-
                         setIsFighting(false);
                         setCountFirstFight(countFirstFight + 1);
                     }
@@ -335,10 +289,14 @@ export default function Championship(){
                     turn = await timeToAttack(0);
                     
                 }
-                               
+                     //HASTA AQUI TODO BIEN          
             }
         } else{ //SEGUNDA  ETAPA PELEA, ES NECESARIO, PUESTO QUE ESTA VEZ VOLVERÁ A ARMARSE UNA BATALLA RANDOM
+            console.log('entra donde me importa');
+            console.log('orderedCharacterClassified.length: ' + orderedCharacterClassified.length );
             if(orderedCharacterClassified.length === 0 ){
+                setIsFighting(false);
+                console.log('se cumple: orderedCharacterClassified.length === 0 ');
                 orderedCharacter.map((element) => {
                     element.map((element) => {
                         if(element.wins >= 1){
@@ -346,13 +304,18 @@ export default function Championship(){
                         }
                     })
                 });
+                console.log('clasificados:');
+                console.log(clasificados);
                 orderCharacterRandom(clasificados)
                 .then((res)=>{
-                    setOrderedCharacterClassified(res);
+                    console.log(res);
                     setIsFighting(false);
+                    console.log('se cumple el then');
                 });
             }
+            //CORRECION ERROR
             if(orderedCharacterClassified.length > 0){
+                console.log('entra al mayor que: ' + orderedCharacterClassified.length)
                 if(countSecondFight <= orderedCharacterClassified.length - 1 ){
                     while(lifeFirstCharacterCopy > 0 && lifeSecondCharacterCopy > 0){
                         if(turn === 0){
@@ -365,37 +328,18 @@ export default function Championship(){
                             } else {
                                 setLifeSecondCharacter(0);
                                 lifeSecondCharacterCopy = 0;
-                                orderedCharacterClassified[countSecondFight][0].wins = orderedCharacterClassified[countSecondFight][0].wins + 1
+                                orderedCharacterClassified[countSecondFight][0].wins += 1
                                 console.log(`El ganador es: ${nameFirstCharacter}`);
-                                result.map((element, idx) => {
-                                    if(element.id === orderedCharacterClassified[countSecondFight][0].id){
-                                        console.log('ya existe');
-                                        existClassifiedOne = true;
-                                        idxClassifiedOne = idx;
-                                    } else {
-                                        console.log('no existe')
-                                        existClassifiedOne = false;
-                                    }
 
-                                    if(element.id === orderedCharacterClassified[countSecondFight][1].id){
+                                orderedCharacter.map((element, idx) => {
+                                    console.log('element[0].id: ' + element[0].id);
+                                    console.log('orderedCharacterClassified[countSecondFight][0].id: ' + orderedCharacterClassified[countSecondFight][0].id)
+                                    if(element[0].id === orderedCharacterClassified[countSecondFight][0].id){
                                         console.log('ya existe');
-                                        existClassifiedTwo = true;
-                                        idxClassifiedTwo = idx;
-                                    } else {
-                                        console.log('no existe')
-                                        existClassifiedTwo = false;
-                                    } 
+                                        console.log(orderedCharacterClassified[countSecondFight][0].wins);
+                                        element[0].wins = orderedCharacterClassified[countSecondFight][0].wins
+                                    }
                                 });
-                                if(existClassifiedOne === true){
-                                    result[idxClassifiedOne].wins =  result[idxClassifiedOne].wins + 1;
-                                } else {
-                                    result.push(orderedCharacterClassified[countSecondFight][0]); //Ganador
-                                }
-                                if(existClassifiedTwo === true){
-                                    //pass
-                                } else {
-                                    result.push(orderedCharacterClassified[countSecondFight][1]);
-                                }
                                 setIsFighting(false);
                                 setCountSecondFight(countSecondFight + 1);
                             }
@@ -408,41 +352,19 @@ export default function Championship(){
                             console.log('ataque efectivo segundo lugar: ' + damageAttacker);
                             lifeFirstCharacterCopy = lifeFirstCharacterCopy - damageAttacker;
                             if(lifeFirstCharacterCopy > 0){
-                                setLifeFirstCharacter(lifeFirstCharacterCopy); 
+                                setLifeFirstCharacter(lifeFirstCharacterCopy);
                             } else {
                                 setLifeFirstCharacter(0);
                                 lifeFirstCharacterCopy = 0;
-                                orderedCharacterClassified[countSecondFight][1].wins = orderedCharacterClassified[countSecondFight][1].wins + 1
+                                orderedCharacterClassified[countSecondFight][1].wins += 1
                                 console.log(`El ganador es: ${nameSecondCharacter}`);
-                                result.map((element, idx) => {
-                                    if(element.id === orderedCharacterClassified[countSecondFight][1].id){
+                                orderedCharacter.map((element) => {
+                                    if(element[1].id === orderedCharacterClassified[countSecondFight][1].id){
                                         console.log('ya existe');
-                                        existClassifiedTwo = true;
-                                        idxClassifiedTwo = idx;
-                                    } else {
-                                        console.log('no existe')
-                                        existClassifiedTwo = false;
+                                        console.log(orderedCharacterClassified[countSecondFight][1].wins);
+                                        element[1].wins = orderedCharacterClassified[countSecondFight][1].wins;
                                     }
-
-                                    if(element.id === orderedCharacterClassified[countSecondFight][0].id){
-                                        console.log('ya existe');
-                                        existClassifiedOne = true;
-                                        idxClassifiedOne = idx;
-                                    } else {
-                                        console.log('no existe')
-                                        existClassifiedOne = false;
-                                    } 
                                 });
-                                if(existClassifiedTwo === true){
-                                    result[idxClassifiedTwo].wins =  result[idxClassifiedTwo].wins + 1;
-                                } else {
-                                    result.push(orderedCharacterClassified[countSecondFight][1]); //Ganador
-                                }
-                                if(existClassifiedOne === true){
-                                    //pass
-                                } else {
-                                    result.push(orderedCharacterClassified[countSecondFight][0]);
-                                }
                                 setIsFighting(false);
                                 setCountSecondFight(countSecondFight + 1);
                             }
@@ -453,7 +375,7 @@ export default function Championship(){
                                        
                     }
                 } else {
-                    console.log(orderedCharacterClassified);
+                    console.log(orderedCharacter);
                 }
             }
         }
@@ -517,7 +439,7 @@ export default function Championship(){
             Pelear
         </Button>
         <Button
-            onClick={() => console.log(result)}
+            onClick={() => handleResults()}
         >
             Resultados
         </Button>
@@ -525,6 +447,11 @@ export default function Championship(){
             onClick={() => handleButtonNext() }
         >
             Otra Batalla
+        </Button>
+        <Button
+            onClick={() => console.log(orderedCharacter)}
+        >
+            Valor ordered caracter
         </Button>
         </div>
 
