@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import api from '../commons/Api';
+import { getApiCharacters }  from '../commons/Api';
 import CardCharacter from './CardCharacter';
 import Grid from '@material-ui/core/Grid';
-import { makeStyles } from '@material-ui/core';
+import { makeStyles, CircularProgress } from '@material-ui/core';
 
 
 
@@ -16,7 +16,11 @@ const useStyles = makeStyles({
     },
     grid: {
         width: '80%',
-    }
+    },
+
+    circularProgress: {
+        color: 'red',
+    },
 });
 //EndStyles
 
@@ -27,23 +31,12 @@ export default function CharacterList(){
     const classes = useStyles();
 
 //States
-    const [isLoading, setIsLoading] = useState(true);
     const [apiData, setApiData] = useState();
+    const [isLoading, setIsLoading] = useState(true);
+    const [errorCharacters, setErrorCharacters] = useState(null);
 //EndStates
 
 //Functions
-    const getApiData = () => {
-        api.get('/v1/public/characters')
-        .then((res) => {
-            console.log(res.data.data.results)
-            setApiData(res.data.data.results);
-            setIsLoading(false);
-        })
-        .catch((err) => {
-            console.log(err);
-        })
-    }
-
     const PrintApiData = () => {
         return apiData.map((element) => (
                <CardCharacter key={element.id} name={element.name} description={element.description}
@@ -53,7 +46,10 @@ export default function CharacterList(){
 //EndFunctions
 
 //Effects
-    useEffect(getApiData, [])
+    useEffect(() => {
+        getApiCharacters(setApiData, setIsLoading, setErrorCharacters);
+        console.log(`Errors: ${errorCharacters}`);
+    }, [errorCharacters])
     
 //EndEffects
 
@@ -69,8 +65,8 @@ export default function CharacterList(){
                 spacing={3}
                 className={classes.grid}
             >
-                {isLoading === false &&
-                    <PrintApiData/>
+                {isLoading === false ?
+                    <PrintApiData/> : <CircularProgress className={classes.circularProgress} />
                 }
 
                 

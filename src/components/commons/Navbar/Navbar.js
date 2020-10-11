@@ -4,6 +4,9 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
+import {
+  Link
+} from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -32,8 +35,8 @@ export default function ButtonAppBar() {
           <Typography variant="h6" className={classes.title}>
             Marvel Fights
           </Typography>
-          <Button color="inherit">Lista de personajes</Button>
-          <Button color="inherit">Torneo</Button>
+          <Button component={ Link } to="/" color="inherit">Lista de personajes</Button>
+          <Button component={ Link } to="/fight" color="inherit">Torneo</Button>
         </Toolbar>
       </AppBar>
     </div>

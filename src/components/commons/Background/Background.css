@@ -2,4 +2,5 @@
     background-image: url(../../images/bg.jpg);
     background-repeat: center;
     background-repeat: 'repeat';
+    min-height: 100vh;
 }

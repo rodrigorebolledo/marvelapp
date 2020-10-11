@@ -27,4 +27,15 @@ const api = axios.create({
 });
 
 
-export default api;
+const getApiCharacters = (setApiData, setIsLoading, setErrorCharacters) => {
+    api.get('/v1/public/characters')
+    .then((res) => {
+        setApiData(res.data.data.results);
+        setIsLoading(false);
+    })
+    .catch((err) => {
+        setErrorCharacters(err);
+    })
+}
+
+export {getApiCharacters, api};
