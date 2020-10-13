@@ -30,7 +30,7 @@ const StyledTableRow = withStyles((theme) => ({
 
 const useStyles = makeStyles({
   tableContainer: {
-    width: '100%'
+    width: '100%',
   },
 });
 
@@ -43,7 +43,7 @@ export default function TableFight(props) {
         item xs={12} md={12}  xl={12} 
     >
         <TableContainer className={classes.tableContainer} component={Paper}>
-        <Table>
+        <Table className={classes.table}>
             <TableHead>
             <TableRow>
                 <StyledTableCell>Name</StyledTableCell>

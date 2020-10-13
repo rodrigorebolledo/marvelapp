@@ -8,6 +8,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
+import { Typography } from '@material-ui/core';
 const StyledTableCell = withStyles((theme) => ({
   head: {
     backgroundColor: theme.palette.common.black,
@@ -57,9 +58,11 @@ export default function TableResult(props) {
 
   return (
     <Grid
-        item item xs={12} md={3}  xl={3} 
-    >   <Paper className={classes.root}>
-            <TableContainer className={classes.container}>
+        item xs={12} md={3}  xl={3} 
+    >   
+        <Typography>Ranking</Typography>
+        <Paper className={classes.root}>
+          <TableContainer className={classes.container}>
             <Table stickyHeader aria-label="sticky table">
                 <TableHead>
                 <TableRow>
@@ -71,7 +74,7 @@ export default function TableResult(props) {
                     <PrintResults result={props.result}/>
                 </TableBody>
             </Table>
-            </TableContainer>
+          </TableContainer>
         </Paper>
     </Grid>
   );

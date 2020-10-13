@@ -8,6 +8,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
+import { Typography } from '@material-ui/core';
 const StyledTableCell = withStyles((theme) => ({
   head: {
     backgroundColor: theme.palette.common.black,
@@ -26,16 +27,6 @@ const StyledTableRow = withStyles((theme) => ({
   },
 }))(TableRow);
 
-function createData(name, wins, power, life, defense) {
-  return { name, wins, power, life, defense };
-}
-
-const rows = [
-
-  [{'name': 'Air-Walker (Gabriel Lan)', 'wins': 0, 'power': 1250, 'life': 3750, 'defense': 750},{'name': 'Abomination (Emil Blonsky)', 'wins': 0, 'power': 1000, 'life': 4750, 'defense': 750}],
-  [{'name': 'TEST', 'wins': 0, 'power': 1300, 'life': 3750, 'defense': 800}, {'name': 'TEST 2', 'wins': 0, 'power': 1200, 'life': 4750, 'defense': 900}],
-  
-];
 
 const useStyles = makeStyles({
   paper: {
@@ -92,6 +83,7 @@ export default function TableOrderedCharacter(props) {
     <Grid
       item xs={12} md={5}  xl={5} 
     >
+      <Typography>Order Fighters</Typography>
       <TableContainer className={classes.paper}  component={Paper}>
         <Table>
           <TableHead>

@@ -478,6 +478,7 @@ export default function Championship(){
                         defenseFirstCharacter={defenseFirstCharacter} defenseSecondCharacter={defenseSecondCharacter}
                         />
                         <Grid>
+                            
                             <Button variant="contained" color="primary" className={classes.buttonFight} onClick={() => handleButtonFight()} disabled={isFighting}>Fight!</Button>
                             <Button variant="contained" color="secondary" onClick={() => handleButtonNext()} disabled={!anotherFight} className={classes.buttonAnotherBattle}>Fight Again</Button>
                             <Button variant="contained" color="secondary" onClick={() => refreshPage()} className={classes.buttonReload}>Reload</Button>
