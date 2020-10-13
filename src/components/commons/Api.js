@@ -18,7 +18,7 @@ const hasher = () => {
 }
 
 const api = axios.create({
-    baseURL: 'http://gateway.marvel.com/',
+    baseURL: 'https://gateway.marvel.com/',
     params: {
         apikey: initialData.publicKey,
         hash: hasher(),
