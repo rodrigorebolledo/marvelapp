@@ -45,23 +45,44 @@ const useStyles = makeStyles({
 
 
 const PrintFighters = (props) => {
-  return props.orderedCharacter.map((elementParent, idx) => (
-      <StyledTableRow key={idx}>
-      <StyledTableCell component="th" scope="row">
-      {idx+1}
-      </StyledTableCell>
-      <StyledTableCell scope="row">
-      {elementParent[0].name}
-      </StyledTableCell>
-      <StyledTableCell scope="row">
-      VS
-      </StyledTableCell>
-      <StyledTableCell scope="row">
-      {elementParent[1].name}
-      </StyledTableCell>
-    </StyledTableRow>
-    )
-  );
+  if(props.orderedCharacterClassified.length > 0){
+      return props.orderedCharacterClassified.map((elementParent, idx) => (
+        <StyledTableRow key={idx}>
+        <StyledTableCell component="th" scope="row">
+        {idx+1}
+        </StyledTableCell>
+        <StyledTableCell scope="row">
+        {elementParent[0].name}
+        </StyledTableCell>
+        <StyledTableCell scope="row">
+        VS
+        </StyledTableCell>
+        <StyledTableCell scope="row">
+        {elementParent[1].name}
+        </StyledTableCell>
+      </StyledTableRow>
+      )
+    );
+  } else {
+      return props.orderedCharacter.map((elementParent, idx) => (
+        <StyledTableRow key={idx}>
+        <StyledTableCell component="th" scope="row">
+        {idx+1}
+        </StyledTableCell>
+        <StyledTableCell scope="row">
+        {elementParent[0].name}
+        </StyledTableCell>
+        <StyledTableCell scope="row">
+        VS
+        </StyledTableCell>
+        <StyledTableCell scope="row">
+        {elementParent[1].name}
+        </StyledTableCell>
+      </StyledTableRow>
+      )
+    );    
+  }
+
 }
 
 export default function TableOrderedCharacter(props) {
@@ -82,7 +103,7 @@ export default function TableOrderedCharacter(props) {
             </TableRow>
           </TableHead>
           <TableBody>
-            <PrintFighters orderedCharacter={props.orderedCharacter}/>
+            <PrintFighters orderedCharacter={props.orderedCharacter} orderedCharacterClassified={props.orderedCharacterClassified}/>
           </TableBody>
         </Table>
       </TableContainer>

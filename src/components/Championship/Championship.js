@@ -262,7 +262,7 @@ export default function Championship(){
         return new Promise((resolve) =>{
             setTimeout(() => {
                 resolve(turn)
-            }, 500)
+            }, 0)
         })
     }
     
@@ -522,8 +522,9 @@ export default function Championship(){
                         justify="center"
                         spacing={4}
                     >
-                        {orderedCharacter !== undefined &&
-                        <TableOrderedCharacter orderedCharacter={orderedCharacter} />   
+                        
+                        {(orderedCharacter !== undefined && orderedCharacterClassified !== undefined) &&
+                        <TableOrderedCharacter orderedCharacter={orderedCharacter} orderedCharacterClassified={orderedCharacterClassified} />   
                         }
                         {result.length >= 0 &&
                             <TableResult result={result}/>
