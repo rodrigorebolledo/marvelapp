@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getApiCharacters} from '../commons/Api';
 import Button from '@material-ui/core/Button';
-import { makeStyles } from '@material-ui/core';
+import { makeStyles, TextField } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
 import TableOrderedCharacter from './TableOrderedCharacter';
 import TableResult from './TableResult';
@@ -39,8 +39,8 @@ export default function Championship(){
     const [orderedCharacter, setOrderedCharacter] = useState([]);
     const [orderedCharacterClassified, setOrderedCharacterClassified] = useState([]);
     const [isFighting, setIsFighting] = useState(false);
-    const [stateFirstCharacter, setStateFirstCharacter ] = useState({})
-    const [stateSecondCharacter, setStateSecondCharacter ] = useState({})
+    // const [stateFirstCharacter, setStateFirstCharacter ] = useState({})
+    // const [stateSecondCharacter, setStateSecondCharacter ] = useState({})
     const [nameFirstCharacter, setNameFirstCharacter] = useState();
     const [nameSecondCharacter, setNameSecondCharacter] = useState();
     const [powerFirstCharacter, setPowerFirstCharacter] = useState();
@@ -52,15 +52,16 @@ export default function Championship(){
     const [countFirstFight, setCountFirstFight] = useState(0);
     const [countSecondFight, setCountSecondFight] = useState(0);
     const [isLoadingFight, setIsLoadingFight] = useState(true)
-    const [isLoadingSecondFight, setIsLoadingSecondFight] = useState(true)
     const [isLoadOrderedCharacter, setIsLoadOrderedCharacter] = useState(true);
     const [isLoadOrderedCharacterClassified, setIsLoadOrderedCharacterClassified] = useState(true);
     const [result, setResult] = useState([]);
-    const [idFirstCharacter, setIdFirstCharacter] = useState();
+    const [idFirstCharacter, setIdFirstCharacter] = useState(); 
     const [idSecondCharacter, setIdSecondCharacter] = useState();
     const [isNext, setIsNext] = useState(false);
-    const [veladas, setVeladas] = useState(3);
+    const [veladas, setVeladas] = useState(1);
     const [countAllFights, setCountAllFights] = useState(1);
+    const [anotherFight, setAnotherFight] = useState(false);
+    const [isStart, setIsStart] = useState(false);
     //Load styles
     const classes = useStyles();
     //Functions 
@@ -127,7 +128,6 @@ export default function Championship(){
     const handleButtonFight = () => {
         if(isFighting === false){
             setIsFighting(!isFighting)
-            console.log('pelea');
         } else {
             console.log('Hay una pelea en curso');
         }
@@ -137,7 +137,6 @@ export default function Championship(){
     const handleButtonNext = () => {
         if(isNext === false){
             setIsNext(!isNext)
-            console.log('Next');
         } else {
             console.log('Hay una next en curso');
         }
@@ -177,9 +176,26 @@ export default function Championship(){
 
             return 0;
         });
-
-        console.log(result);
     }
+
+
+    const handleVeladas = (valor) => {
+        if(valor > 0){
+            setVeladas(valor);
+        } else {
+            console.log('Ingrese valor mayor a 0');
+        }
+        
+    }
+
+    const handleStart = () => {
+        if(veladas > 0){
+            setIsStart(true);
+        } else {
+            alert('Ingrese un valor mayor a 0');
+        }
+    }
+
 
     const getDamage = (powerAttacker, defenseVictim) => {
         const randomNumberOne = Math.random();
@@ -202,10 +218,7 @@ export default function Championship(){
 
     }
     const fightLoader = () => {
-        console.log('isLoadOrderedCharacter: ' + isLoadOrderedCharacter);
-        console.log('isLoadOrderedCharacterClassified: ' + isLoadOrderedCharacterClassified);
         if(isLoadOrderedCharacter === false && isLoadOrderedCharacterClassified === true){
-            console.log('Primera etapa pelea');
             const arrayOfFight = orderedCharacter;
             const arrayOfFightLength = orderedCharacter.length -1;
             if(countFirstFight <= arrayOfFightLength ){
@@ -224,7 +237,6 @@ export default function Championship(){
                 setIsLoadingFight(false);
             }
         } else if(isLoadOrderedCharacterClassified === false){
-            console.log('Segunda etapa pelea');
             const arrayOfSecondFight = orderedCharacterClassified;
             const arrayOfSecondFightLength = orderedCharacterClassified.length -1;
             if(countSecondFight <= arrayOfSecondFightLength ){
@@ -240,7 +252,6 @@ export default function Championship(){
                 setLifeSecondCharacter(characterTwo.life);
                 setDefenseFirstCharacter(characterOne.defense);
                 setDefenseSecondCharacter(characterOne.defense);
-                setIsLoadingSecondFight(false);
             }
             
         }
@@ -251,12 +262,11 @@ export default function Championship(){
         return new Promise((resolve) =>{
             setTimeout(() => {
                 resolve(turn)
-            }, 0)
+            }, 500)
         })
     }
     
     const next = () => {
-        console.log('ejecuta next');
         setIsNext(false);
         orderCharacterRandom()
         .then((res) => {
@@ -267,8 +277,13 @@ export default function Championship(){
             setIsLoadOrderedCharacter(false)
             setIsLoadOrderedCharacterClassified(true)
             setOrderedCharacterClassified([]);
+            setAnotherFight(false);
         });
 
+    }
+
+    const refreshPage = () => {
+        window.location.reload(false);
     }
 
     const fight = async () => {
@@ -279,15 +294,11 @@ export default function Championship(){
         let lifeFirstCharacterCopy = lifeFirstCharacter;
         let lifeSecondCharacterCopy = lifeSecondCharacter;
         let clasificados = [];
-        console.log('isLoadingFight ' + isLoadingFight);
-        console.log('countFirstFight ' + countFirstFight);
-        console.log('orderedCharacter.length  ' + (orderedCharacter.length -1));
         if(countAllFights <= veladas){
             if(isLoadingFight === false && countFirstFight <= orderedCharacter.length - 1){
                 while(lifeFirstCharacterCopy > 0 && lifeSecondCharacterCopy > 0){
                     if(turn === 0){
                         const damageAttacker = await getDamage(powerFirstCharacter, defenseSecondCharacter);
-                        console.log('ataque efectivo primer lugar: ' + damageAttacker);
                         lifeSecondCharacterCopy = lifeSecondCharacterCopy - damageAttacker;
     
                         if(lifeSecondCharacterCopy > 0){
@@ -296,7 +307,6 @@ export default function Championship(){
                             setLifeSecondCharacter(0);
                             lifeSecondCharacterCopy = 0;
                             orderedCharacter[countFirstFight][0].wins = orderedCharacter[countFirstFight][0].wins + 1
-                            console.log(`El ganador es: ${nameFirstCharacter}`);
                             setIsFighting(false);
                             setCountFirstFight(countFirstFight + 1);
                         }
@@ -306,7 +316,6 @@ export default function Championship(){
                         
                     } else{
                         const damageAttacker = await getDamage(powerSecondCharacter, defenseFirstCharacter);
-                        console.log('ataque efectivo segundo lugar: ' + damageAttacker);
                         lifeFirstCharacterCopy = lifeFirstCharacterCopy - damageAttacker;
                         if(lifeFirstCharacterCopy > 0){
                             setLifeFirstCharacter(lifeFirstCharacterCopy); 
@@ -314,7 +323,6 @@ export default function Championship(){
                             setLifeFirstCharacter(0);
                             lifeFirstCharacterCopy = 0;
                             orderedCharacter[countFirstFight][1].wins = orderedCharacter[countFirstFight][1].wins + 1
-                            console.log(`El ganador es: ${nameSecondCharacter}`);
                             setIsFighting(false);
                             setCountFirstFight(countFirstFight + 1);
                         }
@@ -325,12 +333,8 @@ export default function Championship(){
                          //HASTA AQUI TODO BIEN          
                 }
             } else{ //SEGUNDA  ETAPA PELEA, ES NECESARIO, PUESTO QUE ESTA VEZ VOLVERÁ A ARMARSE UNA BATALLA RANDOM
-                console.log('set');
-                console.log('entra donde me importa');
-                console.log('orderedCharacterClassified.length: ' + orderedCharacterClassified.length );
                 if(orderedCharacterClassified.length === 0 ){
                     setIsFighting(false);
-                    console.log('se cumple: orderedCharacterClassified.length === 0 ');
                     orderedCharacter.map((element) => {
                         element.map((element) => {
                             if(element.wins >= 1){
@@ -338,23 +342,17 @@ export default function Championship(){
                             }
                         })
                     });
-                    console.log('clasificados:');
-                    console.log(clasificados);
                     orderCharacterRandom(clasificados)
                     .then((res)=>{
-                        console.log(res);
                         setIsFighting(false);
-                        console.log('se cumple el then');
                     });
                 }
                 //CORRECION ERROR
                 if(orderedCharacterClassified.length > 0){
-                    console.log('entra al mayor que: ' + orderedCharacterClassified.length)
                     if(countSecondFight <= orderedCharacterClassified.length - 1 ){
                         while(lifeFirstCharacterCopy > 0 && lifeSecondCharacterCopy > 0){
                             if(turn === 0){
                                 const damageAttacker = await getDamage(powerFirstCharacter, defenseSecondCharacter);
-                                console.log('ataque efectivo primer lugar: ' + damageAttacker);
                                 lifeSecondCharacterCopy = lifeSecondCharacterCopy - damageAttacker;
             
                                 if(lifeSecondCharacterCopy > 0){
@@ -362,14 +360,9 @@ export default function Championship(){
                                 } else {
                                     setLifeSecondCharacter(0);
                                     lifeSecondCharacterCopy = 0;
-                                    orderedCharacterClassified[countSecondFight][0].wins += 1
-                                    console.log(`El ganador es: ${nameFirstCharacter}`);
-    
+                                    orderedCharacterClassified[countSecondFight][0].wins += 1    
                                     orderedCharacter.map((element, idx) => {
-                                        console.log('element[0].id: ' + element[0].id);
-                                        console.log('orderedCharacterClassified[countSecondFight][0].id: ' + orderedCharacterClassified[countSecondFight][0].id)
                                         if(element[0].id === orderedCharacterClassified[countSecondFight][0].id){
-                                            console.log('ya existe');
                                             console.log(orderedCharacterClassified[countSecondFight][0].wins);
                                             element[0].wins = orderedCharacterClassified[countSecondFight][0].wins
                                         }
@@ -380,7 +373,6 @@ export default function Championship(){
                                 turn = await timeToAttack(1);
                             } else{
                                 const damageAttacker = await getDamage(powerSecondCharacter, defenseFirstCharacter);
-                                console.log('ataque efectivo segundo lugar: ' + damageAttacker);
                                 lifeFirstCharacterCopy = lifeFirstCharacterCopy - damageAttacker;
                                 if(lifeFirstCharacterCopy > 0){
                                     setLifeFirstCharacter(lifeFirstCharacterCopy);
@@ -388,11 +380,8 @@ export default function Championship(){
                                     setLifeFirstCharacter(0);
                                     lifeFirstCharacterCopy = 0;
                                     orderedCharacterClassified[countSecondFight][1].wins += 1
-                                    console.log(`El ganador es: ${nameSecondCharacter}`);
                                     orderedCharacter.map((element) => {
                                         if(element[1].id === orderedCharacterClassified[countSecondFight][1].id){
-                                            console.log('ya existe');
-                                            console.log(orderedCharacterClassified[countSecondFight][1].wins);
                                             element[1].wins = orderedCharacterClassified[countSecondFight][1].wins;
                                         }
                                     });
@@ -405,7 +394,6 @@ export default function Championship(){
                     } else {
                         handleResults();
                         setCountAllFights(countAllFights + 1);
-                        console.log(orderedCharacter);
                     }
                 }
             }
@@ -465,15 +453,20 @@ export default function Championship(){
         }
     },[countFirstFight, countSecondFight])
 
+
     useEffect(() => {
-            console.log('countAllFights:  ' + countAllFights);
-    },[countAllFights]);
+        if(isFighting === true && countAllFights <= veladas){
+            setAnotherFight(true);
+        } else {
+            setAnotherFight(false);
+        }
+    },[countAllFights])
 
 
     const PrintTableAndButtonFight = () => {
         if(nameFirstCharacter !== undefined && nameSecondCharacter !== undefined && 
             powerFirstCharacter !== undefined && powerSecondCharacter !== undefined && 
-            lifeFirstCharacter !== undefined && lifeSecondCharacter !== undefined && defenseFirstCharacter != undefined && defenseSecondCharacter != undefined){
+            lifeFirstCharacter !== undefined && lifeSecondCharacter !== undefined && defenseFirstCharacter !== undefined && defenseSecondCharacter !== undefined){
                 return(
                     <Grid
                         container
@@ -486,13 +479,62 @@ export default function Championship(){
                         />
                         <Grid>
                             <Button variant="contained" color="primary" className={classes.buttonFight} onClick={() => handleButtonFight()} disabled={isFighting}>Fight!</Button>
-                            <Button variant="contained" color="secondary" onClick={() => handleButtonNext()} disabled={true} className={classes.buttonAnotherBattle}>Otra Batalla</Button>
+                            <Button variant="contained" color="secondary" onClick={() => handleButtonNext()} disabled={!anotherFight} className={classes.buttonAnotherBattle}>Fight Again</Button>
+                            <Button variant="contained" color="secondary" onClick={() => refreshPage()} className={classes.buttonReload}>Reload</Button>
                         </Grid>
                     </Grid>
                 );
             } else {
                 return null;
             }
+    }
+
+
+    const PrintSelectVeladas = () => {
+        if(isStart === false){
+            return (
+                <Grid>
+                    <TextField min="1" id="standard-basic" label="Number of Tournaments"
+                    value={veladas} key={1} onChange={(e) => {handleVeladas(e.target.value)}} type="number"
+                    InputProps={{
+                        inputProps: { 
+                            min: 1 
+                        }
+                    }}
+                    />
+                    <Button variant="contained" color="primary" onClick={() => handleStart()}>
+                        Start
+                    </Button>
+                </Grid>
+            );
+        } else {
+            return null;
+        }
+    }
+
+    const PrintDashboard = () => {
+        if(isStart === true){
+            return (
+                <Grid>
+                    <PrintTableAndButtonFight/>
+                    <Grid
+                        container
+                        justify="center"
+                        spacing={4}
+                    >
+                        {orderedCharacter !== undefined &&
+                        <TableOrderedCharacter orderedCharacter={orderedCharacter} />   
+                        }
+                        {result.length >= 0 &&
+                            <TableResult result={result}/>
+                        }
+                        
+                    </Grid>    
+            </Grid>
+            )
+        } else {
+            return null;
+        }
     }
 
     return (
@@ -502,22 +544,9 @@ export default function Championship(){
                 justify="center"
                 className={classes.container}
             >
-                <Grid>
-                    <PrintTableAndButtonFight/>
-                    <Grid
-                        container
-                        justify="center"
-                        spacing={4}
-                    >
-                        {orderedCharacter != undefined &&
-                        <TableOrderedCharacter orderedCharacter={orderedCharacter} />   
-                        }
-                        {result.length >= 0 &&
-                            <TableResult result={result}/>
-                        }
-                        
-                    </Grid>    
-                </Grid>
+
+                <PrintSelectVeladas/>
+                <PrintDashboard/>
             </Grid>
     );
 }

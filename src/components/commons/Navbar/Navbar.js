@@ -35,8 +35,8 @@ export default function ButtonAppBar() {
           <Typography variant="h6" className={classes.title}>
             Marvel Fights
           </Typography>
-          <Button component={ Link } to="/" color="inherit">Lista de personajes</Button>
-          <Button component={ Link } to="/fight" color="inherit">Torneo</Button>
+          <Button component={ Link } to="/" color="inherit">Characters</Button>
+          <Button component={ Link } to="/fight" color="inherit">Tournament</Button>
         </Toolbar>
       </AppBar>
     </div>
