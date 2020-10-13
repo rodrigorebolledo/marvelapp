@@ -262,7 +262,7 @@ export default function Championship(){
         return new Promise((resolve) =>{
             setTimeout(() => {
                 resolve(turn)
-            }, 0)
+            }, 500)
         })
     }
     
