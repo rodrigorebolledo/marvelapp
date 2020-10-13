@@ -39,8 +39,6 @@ export default function Championship(){
     const [orderedCharacter, setOrderedCharacter] = useState([]);
     const [orderedCharacterClassified, setOrderedCharacterClassified] = useState([]);
     const [isFighting, setIsFighting] = useState(false);
-    // const [stateFirstCharacter, setStateFirstCharacter ] = useState({})
-    // const [stateSecondCharacter, setStateSecondCharacter ] = useState({})
     const [nameFirstCharacter, setNameFirstCharacter] = useState();
     const [nameSecondCharacter, setNameSecondCharacter] = useState();
     const [powerFirstCharacter, setPowerFirstCharacter] = useState();
@@ -329,8 +327,7 @@ export default function Championship(){
                         
                         turn = await timeToAttack(0);
                         
-                    }
-                         //HASTA AQUI TODO BIEN          
+                    }       
                 }
             } else{ //SEGUNDA  ETAPA PELEA, ES NECESARIO, PUESTO QUE ESTA VEZ VOLVERÁ A ARMARSE UNA BATALLA RANDOM
                 if(orderedCharacterClassified.length === 0 ){
@@ -347,7 +344,6 @@ export default function Championship(){
                         setIsFighting(false);
                     });
                 }
-                //CORRECION ERROR
                 if(orderedCharacterClassified.length > 0){
                     if(countSecondFight <= orderedCharacterClassified.length - 1 ){
                         while(lifeFirstCharacterCopy > 0 && lifeSecondCharacterCopy > 0){
