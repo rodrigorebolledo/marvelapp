@@ -2,6 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { getApiCharacters} from '../commons/Api';
 import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/core';
+import Grid from '@material-ui/core/Grid';
+import TableOrderedCharacter from './TableOrderedCharacter';
+import TableResult from './TableResult';
+import TableFight from './TableFight';
 
 const powerList = [1000, 1250, 1100, 1150, 995, 1200]
 const lifeList = [5000, 4750, 4500, 4250, 4000, 3750]
@@ -11,8 +15,20 @@ const randomNumberBetweenRange = (min, max) => {
 }
 
 const useStyles = makeStyles({
-    root: {
+    container_buttons: {
         backgroundColor: 'white',
+    },
+    container:{
+        paddingTop: 30,
+        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+        height: 1000
+    },
+
+    buttonFight:{
+        margin: 15
+    },
+    buttonAnotherBattle:{
+        margin: 15
     }
 });
 
@@ -44,6 +60,7 @@ export default function Championship(){
     const [idSecondCharacter, setIdSecondCharacter] = useState();
     const [isNext, setIsNext] = useState(false);
     const [veladas, setVeladas] = useState(3);
+    const [countAllFights, setCountAllFights] = useState(1);
     //Load styles
     const classes = useStyles();
     //Functions 
@@ -103,7 +120,7 @@ export default function Championship(){
                     resolve(orderedCharacters);
                 }
             }
-        })
+        });
 
     }
 
@@ -128,12 +145,26 @@ export default function Championship(){
     }
 
     const handleResults = () => {
-        let result = []
-        orderedCharacter.map((parentElement) => {
-            parentElement.map((childElement) => {
-                result.push(childElement);
+
+        if(result.length === 0){
+            orderedCharacter.map((parentElement) => {
+                parentElement.map((childElement) => {
+                    result.push(childElement);
+                });
             });
-        });
+        } else {
+            orderedCharacter.map((parentElement) => {
+                parentElement.map((childElement) => {
+                    result.map((elementR) => {
+                        if(elementR.id === childElement.id){
+                            elementR.wins += childElement.wins;
+                        }
+                    });
+                });
+            });
+
+        }
+
 
         result.sort((a, b) => {
             if(a.wins > b.wins){
@@ -149,7 +180,6 @@ export default function Championship(){
 
         console.log(result);
     }
-
 
     const getDamage = (powerAttacker, defenseVictim) => {
         const randomNumberOne = Math.random();
@@ -228,7 +258,7 @@ export default function Championship(){
     const next = () => {
         console.log('ejecuta next');
         setIsNext(false);
-        orderCharacterRandom(result)
+        orderCharacterRandom()
         .then((res) => {
             setCountFirstFight(0);
             setCountSecondFight(0);
@@ -242,6 +272,8 @@ export default function Championship(){
     }
 
     const fight = async () => {
+
+
         //Este while permite que la pelea se siga ejecutando hasta que alguno de los personajes pierda toda la vida
         let turn = 0;
         let lifeFirstCharacterCopy = lifeFirstCharacter;
@@ -250,135 +282,137 @@ export default function Championship(){
         console.log('isLoadingFight ' + isLoadingFight);
         console.log('countFirstFight ' + countFirstFight);
         console.log('orderedCharacter.length  ' + (orderedCharacter.length -1));
-        if(isLoadingFight === false && countFirstFight <= orderedCharacter.length - 1){
-            while(lifeFirstCharacterCopy > 0 && lifeSecondCharacterCopy > 0){
-                if(turn === 0){
-                    const damageAttacker = await getDamage(powerFirstCharacter, defenseSecondCharacter);
-                    console.log('ataque efectivo primer lugar: ' + damageAttacker);
-                    lifeSecondCharacterCopy = lifeSecondCharacterCopy - damageAttacker;
-
-                    if(lifeSecondCharacterCopy > 0){
-                        setLifeSecondCharacter(lifeSecondCharacterCopy);
-                    } else {
-                        setLifeSecondCharacter(0);
-                        lifeSecondCharacterCopy = 0;
-                        orderedCharacter[countFirstFight][0].wins = orderedCharacter[countFirstFight][0].wins + 1
-                        console.log(`El ganador es: ${nameFirstCharacter}`);
-                        setIsFighting(false);
-                        setCountFirstFight(countFirstFight + 1);
-                    }
-                    
-                    turn = await timeToAttack(1);
-
-                    
-                } else{
-                    const damageAttacker = await getDamage(powerSecondCharacter, defenseFirstCharacter);
-                    console.log('ataque efectivo segundo lugar: ' + damageAttacker);
-                    lifeFirstCharacterCopy = lifeFirstCharacterCopy - damageAttacker;
-                    if(lifeFirstCharacterCopy > 0){
-                        setLifeFirstCharacter(lifeFirstCharacterCopy); 
-                    } else {
-                        setLifeFirstCharacter(0);
-                        lifeFirstCharacterCopy = 0;
-                        orderedCharacter[countFirstFight][1].wins = orderedCharacter[countFirstFight][1].wins + 1
-                        console.log(`El ganador es: ${nameSecondCharacter}`);
-                        setIsFighting(false);
-                        setCountFirstFight(countFirstFight + 1);
-                    }
-                    
-                    turn = await timeToAttack(0);
-                    
-                }
-                     //HASTA AQUI TODO BIEN          
-            }
-        } else{ //SEGUNDA  ETAPA PELEA, ES NECESARIO, PUESTO QUE ESTA VEZ VOLVERÁ A ARMARSE UNA BATALLA RANDOM
-            console.log('entra donde me importa');
-            console.log('orderedCharacterClassified.length: ' + orderedCharacterClassified.length );
-            if(orderedCharacterClassified.length === 0 ){
-                setIsFighting(false);
-                console.log('se cumple: orderedCharacterClassified.length === 0 ');
-                orderedCharacter.map((element) => {
-                    element.map((element) => {
-                        if(element.wins >= 1){
-                            clasificados.push(element)
+        if(countAllFights <= veladas){
+            if(isLoadingFight === false && countFirstFight <= orderedCharacter.length - 1){
+                while(lifeFirstCharacterCopy > 0 && lifeSecondCharacterCopy > 0){
+                    if(turn === 0){
+                        const damageAttacker = await getDamage(powerFirstCharacter, defenseSecondCharacter);
+                        console.log('ataque efectivo primer lugar: ' + damageAttacker);
+                        lifeSecondCharacterCopy = lifeSecondCharacterCopy - damageAttacker;
+    
+                        if(lifeSecondCharacterCopy > 0){
+                            setLifeSecondCharacter(lifeSecondCharacterCopy);
+                        } else {
+                            setLifeSecondCharacter(0);
+                            lifeSecondCharacterCopy = 0;
+                            orderedCharacter[countFirstFight][0].wins = orderedCharacter[countFirstFight][0].wins + 1
+                            console.log(`El ganador es: ${nameFirstCharacter}`);
+                            setIsFighting(false);
+                            setCountFirstFight(countFirstFight + 1);
                         }
-                    })
-                });
-                console.log('clasificados:');
-                console.log(clasificados);
-                orderCharacterRandom(clasificados)
-                .then((res)=>{
-                    console.log(res);
+                        
+                        turn = await timeToAttack(1);
+    
+                        
+                    } else{
+                        const damageAttacker = await getDamage(powerSecondCharacter, defenseFirstCharacter);
+                        console.log('ataque efectivo segundo lugar: ' + damageAttacker);
+                        lifeFirstCharacterCopy = lifeFirstCharacterCopy - damageAttacker;
+                        if(lifeFirstCharacterCopy > 0){
+                            setLifeFirstCharacter(lifeFirstCharacterCopy); 
+                        } else {
+                            setLifeFirstCharacter(0);
+                            lifeFirstCharacterCopy = 0;
+                            orderedCharacter[countFirstFight][1].wins = orderedCharacter[countFirstFight][1].wins + 1
+                            console.log(`El ganador es: ${nameSecondCharacter}`);
+                            setIsFighting(false);
+                            setCountFirstFight(countFirstFight + 1);
+                        }
+                        
+                        turn = await timeToAttack(0);
+                        
+                    }
+                         //HASTA AQUI TODO BIEN          
+                }
+            } else{ //SEGUNDA  ETAPA PELEA, ES NECESARIO, PUESTO QUE ESTA VEZ VOLVERÁ A ARMARSE UNA BATALLA RANDOM
+                console.log('set');
+                console.log('entra donde me importa');
+                console.log('orderedCharacterClassified.length: ' + orderedCharacterClassified.length );
+                if(orderedCharacterClassified.length === 0 ){
                     setIsFighting(false);
-                    console.log('se cumple el then');
-                });
-            }
-            //CORRECION ERROR
-            if(orderedCharacterClassified.length > 0){
-                console.log('entra al mayor que: ' + orderedCharacterClassified.length)
-                if(countSecondFight <= orderedCharacterClassified.length - 1 ){
-                    while(lifeFirstCharacterCopy > 0 && lifeSecondCharacterCopy > 0){
-                        if(turn === 0){
-                            const damageAttacker = await getDamage(powerFirstCharacter, defenseSecondCharacter);
-                            console.log('ataque efectivo primer lugar: ' + damageAttacker);
-                            lifeSecondCharacterCopy = lifeSecondCharacterCopy - damageAttacker;
-        
-                            if(lifeSecondCharacterCopy > 0){
-                                setLifeSecondCharacter(lifeSecondCharacterCopy);
-                            } else {
-                                setLifeSecondCharacter(0);
-                                lifeSecondCharacterCopy = 0;
-                                orderedCharacterClassified[countSecondFight][0].wins += 1
-                                console.log(`El ganador es: ${nameFirstCharacter}`);
-
-                                orderedCharacter.map((element, idx) => {
-                                    console.log('element[0].id: ' + element[0].id);
-                                    console.log('orderedCharacterClassified[countSecondFight][0].id: ' + orderedCharacterClassified[countSecondFight][0].id)
-                                    if(element[0].id === orderedCharacterClassified[countSecondFight][0].id){
-                                        console.log('ya existe');
-                                        console.log(orderedCharacterClassified[countSecondFight][0].wins);
-                                        element[0].wins = orderedCharacterClassified[countSecondFight][0].wins
-                                    }
-                                });
-                                setIsFighting(false);
-                                setCountSecondFight(countSecondFight + 1);
+                    console.log('se cumple: orderedCharacterClassified.length === 0 ');
+                    orderedCharacter.map((element) => {
+                        element.map((element) => {
+                            if(element.wins >= 1){
+                                clasificados.push(element)
                             }
-                            
-                            turn = await timeToAttack(1);
-        
-                            
-                        } else{
-                            const damageAttacker = await getDamage(powerSecondCharacter, defenseFirstCharacter);
-                            console.log('ataque efectivo segundo lugar: ' + damageAttacker);
-                            lifeFirstCharacterCopy = lifeFirstCharacterCopy - damageAttacker;
-                            if(lifeFirstCharacterCopy > 0){
-                                setLifeFirstCharacter(lifeFirstCharacterCopy);
-                            } else {
-                                setLifeFirstCharacter(0);
-                                lifeFirstCharacterCopy = 0;
-                                orderedCharacterClassified[countSecondFight][1].wins += 1
-                                console.log(`El ganador es: ${nameSecondCharacter}`);
-                                orderedCharacter.map((element) => {
-                                    if(element[1].id === orderedCharacterClassified[countSecondFight][1].id){
-                                        console.log('ya existe');
-                                        console.log(orderedCharacterClassified[countSecondFight][1].wins);
-                                        element[1].wins = orderedCharacterClassified[countSecondFight][1].wins;
-                                    }
-                                });
-                                setIsFighting(false);
-                                setCountSecondFight(countSecondFight + 1);
-                            }
-                            
-                            turn = await timeToAttack(0);
-                            
+                        })
+                    });
+                    console.log('clasificados:');
+                    console.log(clasificados);
+                    orderCharacterRandom(clasificados)
+                    .then((res)=>{
+                        console.log(res);
+                        setIsFighting(false);
+                        console.log('se cumple el then');
+                    });
+                }
+                //CORRECION ERROR
+                if(orderedCharacterClassified.length > 0){
+                    console.log('entra al mayor que: ' + orderedCharacterClassified.length)
+                    if(countSecondFight <= orderedCharacterClassified.length - 1 ){
+                        while(lifeFirstCharacterCopy > 0 && lifeSecondCharacterCopy > 0){
+                            if(turn === 0){
+                                const damageAttacker = await getDamage(powerFirstCharacter, defenseSecondCharacter);
+                                console.log('ataque efectivo primer lugar: ' + damageAttacker);
+                                lifeSecondCharacterCopy = lifeSecondCharacterCopy - damageAttacker;
+            
+                                if(lifeSecondCharacterCopy > 0){
+                                    setLifeSecondCharacter(lifeSecondCharacterCopy);
+                                } else {
+                                    setLifeSecondCharacter(0);
+                                    lifeSecondCharacterCopy = 0;
+                                    orderedCharacterClassified[countSecondFight][0].wins += 1
+                                    console.log(`El ganador es: ${nameFirstCharacter}`);
+    
+                                    orderedCharacter.map((element, idx) => {
+                                        console.log('element[0].id: ' + element[0].id);
+                                        console.log('orderedCharacterClassified[countSecondFight][0].id: ' + orderedCharacterClassified[countSecondFight][0].id)
+                                        if(element[0].id === orderedCharacterClassified[countSecondFight][0].id){
+                                            console.log('ya existe');
+                                            console.log(orderedCharacterClassified[countSecondFight][0].wins);
+                                            element[0].wins = orderedCharacterClassified[countSecondFight][0].wins
+                                        }
+                                    });
+                                    setIsFighting(false);
+                                    setCountSecondFight(countSecondFight + 1);
+                                }                            
+                                turn = await timeToAttack(1);
+                            } else{
+                                const damageAttacker = await getDamage(powerSecondCharacter, defenseFirstCharacter);
+                                console.log('ataque efectivo segundo lugar: ' + damageAttacker);
+                                lifeFirstCharacterCopy = lifeFirstCharacterCopy - damageAttacker;
+                                if(lifeFirstCharacterCopy > 0){
+                                    setLifeFirstCharacter(lifeFirstCharacterCopy);
+                                } else {
+                                    setLifeFirstCharacter(0);
+                                    lifeFirstCharacterCopy = 0;
+                                    orderedCharacterClassified[countSecondFight][1].wins += 1
+                                    console.log(`El ganador es: ${nameSecondCharacter}`);
+                                    orderedCharacter.map((element) => {
+                                        if(element[1].id === orderedCharacterClassified[countSecondFight][1].id){
+                                            console.log('ya existe');
+                                            console.log(orderedCharacterClassified[countSecondFight][1].wins);
+                                            element[1].wins = orderedCharacterClassified[countSecondFight][1].wins;
+                                        }
+                                    });
+                                    setIsFighting(false);
+                                    setCountSecondFight(countSecondFight + 1);
+                                }
+                                turn = await timeToAttack(0);
+                            }               
                         }
-                                       
+                    } else {
+                        handleResults();
+                        setCountAllFights(countAllFights + 1);
+                        console.log(orderedCharacter);
                     }
-                } else {
-                    console.log(orderedCharacter);
                 }
             }
+        } else{
+            console.log('Se ha excedido el número de peleas')
         }
+
 
     }
 
@@ -431,30 +465,59 @@ export default function Championship(){
         }
     },[countFirstFight, countSecondFight])
 
+    useEffect(() => {
+            console.log('countAllFights:  ' + countAllFights);
+    },[countAllFights]);
+
+
+    const PrintTableAndButtonFight = () => {
+        if(nameFirstCharacter !== undefined && nameSecondCharacter !== undefined && 
+            powerFirstCharacter !== undefined && powerSecondCharacter !== undefined && 
+            lifeFirstCharacter !== undefined && lifeSecondCharacter !== undefined && defenseFirstCharacter != undefined && defenseSecondCharacter != undefined){
+                return(
+                    <Grid
+                        container
+                        justify="center"
+                    >
+                        <TableFight nameFirstCharacter={nameFirstCharacter} nameSecondCharacter={nameSecondCharacter}
+                        powerFirstCharacter={powerFirstCharacter} powerSecondCharacter={powerSecondCharacter}
+                        lifeFirstCharacter={lifeFirstCharacter} lifeSecondCharacter={lifeSecondCharacter}
+                        defenseFirstCharacter={defenseFirstCharacter} defenseSecondCharacter={defenseSecondCharacter}
+                        />
+                        <Grid>
+                            <Button variant="contained" color="primary" className={classes.buttonFight} onClick={() => handleButtonFight()} disabled={isFighting}>Fight!</Button>
+                            <Button variant="contained" color="secondary" onClick={() => handleButtonNext()} disabled={true} className={classes.buttonAnotherBattle}>Otra Batalla</Button>
+                        </Grid>
+                    </Grid>
+                );
+            } else {
+                return null;
+            }
+    }
+
     return (
-        <div className={classes.root}>
-        <Button
-            onClick={() => handleButtonFight() }
-        >
-            Pelear
-        </Button>
-        <Button
-            onClick={() => handleResults()}
-        >
-            Resultados
-        </Button>
-        <Button
-            onClick={() => handleButtonNext() }
-        >
-            Otra Batalla
-        </Button>
-        <Button
-            onClick={() => console.log(orderedCharacter)}
-        >
-            Valor ordered caracter
-        </Button>
-        </div>
-
-
+            <Grid
+                container
+                direction="row"
+                justify="center"
+                className={classes.container}
+            >
+                <Grid>
+                    <PrintTableAndButtonFight/>
+                    <Grid
+                        container
+                        justify="center"
+                        spacing={4}
+                    >
+                        {orderedCharacter != undefined &&
+                        <TableOrderedCharacter orderedCharacter={orderedCharacter} />   
+                        }
+                        {result.length >= 0 &&
+                            <TableResult result={result}/>
+                        }
+                        
+                    </Grid>    
+                </Grid>
+            </Grid>
     );
 }
